@@ -59,4 +59,18 @@ public class ThresholdTest {
         assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(8))));
         assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(10))));  //not reach even if difference > 0.5, because direction is asc
     }
+
+    @Test
+    public void testLinearIncreasing() throws Exception {
+        Threshold threshold=new Threshold("testthres",Double.valueOf(3), Direction.NONE,Double.valueOf(1));
+        ThresholdManager thresholdManager=new ThresholdManager(threshold);
+        assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(0))));
+        assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(1)))); //first time reach
+        assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(2)))); //second time not reach because difference < 0.5
+        assertTrue(thresholdManager.reach(new Celsius(Double.valueOf(3))));
+        assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(0)))); //not reach because difference < 0.5
+        assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(1))));
+        assertFalse(thresholdManager.reach(new Celsius(Double.valueOf(2))));  //reach because difference > 0.5 and its desc
+        assertTrue(thresholdManager.reach(new Celsius(Double.valueOf(3)))); //not reach even if difference > 0.5, because direction is asc
+    }
 }

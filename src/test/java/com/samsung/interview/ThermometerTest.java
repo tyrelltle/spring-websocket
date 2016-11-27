@@ -1,6 +1,6 @@
 package com.samsung.interview;
 
-import com.samsung.interview.domain.Thermometer;
+import com.samsung.interview.service.Thermometer;
 import com.samsung.interview.domain.tempsource.TextTemperatureSource;
 import com.samsung.interview.domain.threshold.Direction;
 import com.samsung.interview.domain.threshold.Threshold;

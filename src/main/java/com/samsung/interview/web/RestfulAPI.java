@@ -1,6 +1,6 @@
 package com.samsung.interview.web;
 
-import com.samsung.interview.domain.Thermometer;
+import com.samsung.interview.service.Thermometer;
 import com.samsung.interview.domain.tempsource.TextTemperatureSource;
 import com.samsung.interview.domain.threshold.Threshold;
 import org.springframework.beans.factory.annotation.Autowired;

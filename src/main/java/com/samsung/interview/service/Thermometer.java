@@ -1,6 +1,7 @@
-package com.samsung.interview.domain;
+package com.samsung.interview.service;
 
 
+import com.samsung.interview.domain.Subscriber;
 import com.samsung.interview.domain.exceptions.DuplicateSubscriber;
 import com.samsung.interview.domain.exceptions.InvalidTemperatureFormate;
 import com.samsung.interview.domain.temperature.AbstractTemperature;
@@ -80,11 +81,10 @@ public class Thermometer {
         while(source.hasNaxt()){
             AbstractTemperature temperature=source.readNext();
             for(Subscriber subscriber : this.subscribers){
+                subscriber.setReachedThreshold(null);
                 subscriber.getThresholdManagers().forEach(mngr->{
                     if(mngr.reach(temperature)){
                         subscriber.setReachedThreshold(mngr.getThreshold());
-                    }else{
-                        subscriber.setReachedThreshold(null);
                     }
                 });
                 Threshold reachedt = subscriber.getReachedThreshold();
@@ -92,5 +92,7 @@ public class Thermometer {
             }
         }
     }
+
+
 
 }
