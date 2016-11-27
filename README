@@ -1,0 +1,8 @@
+Technical Stack:
+-Spring MVC + gradle
+-Angular.js
+
+
+To run:
+first cd to the project directory, and then type
+./gradlew bootRun

@@ -1,0 +1,124 @@
+<style>
+    .div_wrapper{
+        border:black 1px solid;
+    }
+</style>
+<div class="row" ng-controller="Ctrl" style="padding:100px">
+    <br>
+        Add new subscribers on the left panel.<br/>
+        For each subscribers, you can define multiple thresholds.<br/>
+        The on the right panel, add new temperatures. Each time added,<br/>
+        the page will refresh, and on the left handside you can see<br/>
+        which subscribers have reached their interested threshold.<br/>
+
+        <br/>
+        ======NOTE======<br/>
+        According to requirement,If you have threshold with value===0 and fluctuation==0, </br>
+        then you enter new temperature value 0 on right hand panel twice, you wont see the</br>
+        subscriber reaches the threshold twice,This is because fluctuation ==0 means</br>
+        the second time when temperature reaches 0, the differece between previous </br>
+        temperature does not exeed the fluctuaion limit (which is 0)</br>
+
+
+
+    </p>
+    <div class="col-md-4 div_wrapper">
+        <h3>Subscribers</h3>
+        <button ng-click="addSubscriber()">Add New</button>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Subscriber Name</th>
+                <th>Reached Threshold</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="subs in page.subscribers">
+                <td>{{subs.name}}</td>
+                <td>{{subs.reachedThreasholdName}}</td>
+            </tr>
+            </tbody>
+        </table>
+
+
+
+    </div>
+    <div class="col-md-4 div_wrapper">
+        <h3>Add new Temperatures</h3>
+
+        <div class="input-group">
+            <span class="input-group-addon">Value</span>
+            <input type="number" class="form-control" ng-model="page.newTempValue">
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-addon">Temperature Type</span>
+            <select id="temp_mode_select">
+                <option value="C">C</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <button ng-click="addNewTemp()">Add New</button>
+
+    </div>
+</div>
+
+
+<script type="text/ng-template" id="addSubscriber.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Define New Subscriber</h3>
+    </div>
+    <div class="modal-body">
+        <div>
+            <div class="input-group">
+                <span class="input-group-addon">Subscriber Name</span>
+                <input type="text" class="form-control" ng-model="doc.name">
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Define Thresholds</div>
+            <div class="panel-body">
+                <div class="input-group">
+                    <span class="input-group-addon">Name</span>
+                    <input type="text" class="form-control" ng-model="newthres.name">
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon">Value</span>
+                    <input type="text" class="form-control" ng-model="newthres.value">
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon">Restricted Direction</span>
+                    <select id="direction_select">
+                        <option value="NONE">NONE</option>
+                        <option value="ASC">ASC</option>
+                        <option value="DESC">DESC</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon">Restricted Fluctuation</span>
+                    <input type="text" class="form-control" ng-model="newthres.fluctuation">
+                </div>
+
+                <button ng-click="addthres()">Add Threshold</button>
+
+                <br/><br/>
+                <div>
+                    <h4 ng-if="doc.thresholds.length>0">Added Threshold so far</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="thre in doc.thresholds">{{thre.name}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="create()">OK</button>
+    </div>
+</script>
