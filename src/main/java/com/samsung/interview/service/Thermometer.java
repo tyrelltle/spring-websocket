@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -94,5 +95,7 @@ public class Thermometer {
     }
 
 
-
+    public Optional<Subscriber> getSubscriber(String name) {
+        return this.subscribers.stream().filter(s->s.getName().equals(name)).findFirst();
+    }
 }

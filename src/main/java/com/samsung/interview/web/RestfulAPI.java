@@ -1,8 +1,9 @@
 package com.samsung.interview.web;
 
-import com.samsung.interview.service.Thermometer;
+import com.samsung.interview.domain.Subscriber;
 import com.samsung.interview.domain.tempsource.TextTemperatureSource;
 import com.samsung.interview.domain.threshold.Threshold;
+import com.samsung.interview.service.Thermometer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.validation.Valid;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -45,6 +47,19 @@ public class RestfulAPI {
     public ResponseEntity<List<SubscriberThresholdDTO>> getSubscriberAndReachedThres() throws URISyntaxException {
         try {
             return new ResponseEntity<>(thermometer.getSubscriberReachedThreshold(),HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/subscribers/{name}/validate",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> getSubscriberAndReachedThres(@PathVariable("name") String name) throws URISyntaxException {
+        try {
+            Optional<Subscriber> subscriber=thermometer.getSubscriber(name);
+            return new ResponseEntity<>(subscriber.isPresent(),HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
