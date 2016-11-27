@@ -11,4 +11,9 @@ public class Celsius extends AbstractTemperature{
     public Double determineNormalizedValue(Double value) {
         return value;
     }
+
+    @Override
+    public String stringify() {
+        return this.value+" C";
+    }
 }

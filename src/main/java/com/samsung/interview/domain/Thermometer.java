@@ -6,7 +6,9 @@ import com.samsung.interview.domain.exceptions.InvalidTemperatureFormate;
 import com.samsung.interview.domain.temperature.AbstractTemperature;
 import com.samsung.interview.domain.tempsource.ITemperatureSource;
 import com.samsung.interview.domain.threshold.Threshold;
+import com.samsung.interview.socket.SocketSender;
 import com.samsung.interview.web.SubscriberThresholdDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,6 +18,9 @@ import java.util.stream.Collectors;
 @Component
 public class Thermometer {
     final List<Subscriber> subscribers =new ArrayList<Subscriber>();
+
+    @Autowired
+    SocketSender socketSender;
 
     public void addSubscriber(String name,List<Threshold> threshold) throws DuplicateSubscriber {
         long countExisting=this.subscribers.stream()
@@ -74,7 +79,6 @@ public class Thermometer {
         final Exception e;
         while(source.hasNaxt()){
             AbstractTemperature temperature=source.readNext();
-
             for(Subscriber subscriber : this.subscribers){
                 subscriber.getThresholdManagers().forEach(mngr->{
                     if(mngr.reach(temperature)){
@@ -83,7 +87,8 @@ public class Thermometer {
                         subscriber.setReachedThreshold(null);
                     }
                 });
-
+                Threshold reachedt = subscriber.getReachedThreshold();
+                socketSender.notifyThresholdReachClient(subscriber.getName(), temperature,reachedt);
             }
         }
     }

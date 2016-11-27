@@ -14,4 +14,9 @@ public class Fahrenheit extends AbstractTemperature {
         double val= (value-32)/1.8;
         return new BigDecimal(val).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
+
+    @Override
+    public String stringify() {
+        return this.value+" F";
+    }
 }
