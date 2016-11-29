@@ -90,4 +90,7 @@ public class Thermometer {
     }
 
 
+    public void removeSubscriber(String name) {
+        this.subscribers.remove(name);
+    }
 }

@@ -65,6 +65,20 @@ public class RestfulAPI {
         }
     }
 
+    @RequestMapping(value = "/subscribers/{name}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity remoteSub(@PathVariable("name") String name) throws URISyntaxException {
+        try {
+            thermometer.removeSubscriber(name);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
     @RequestMapping(value = "/subscribers/{name}/thresholds",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
