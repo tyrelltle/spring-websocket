@@ -12,35 +12,34 @@ import com.samsung.interview.web.SubscriberThresholdDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
 public class Thermometer {
-    final List<Subscriber> subscribers =new ArrayList<Subscriber>();
+    final Map<String,Subscriber> subscribers =new ConcurrentHashMap<>();
 
     @Autowired
     SocketSender socketSender;
 
+    @Autowired
+    AsyncProcessTemperature asyncProcessTemperature;
+
     public void addSubscriber(String name,List<Threshold> threshold) throws DuplicateSubscriber {
-        long countExisting=this.subscribers.stream()
-                .filter(s->s.getName().equals(name))
-                .count();
-        if(countExisting>0){
+        boolean countExisting=this.subscribers.containsKey(name);
+        if(countExisting){
             throw new DuplicateSubscriber(name+" subscriber already exists");
         }
 
         //if(threshold!=null){
-            this.subscribers.add(new Subscriber(name,threshold));
+            this.subscribers.put(name,new Subscriber(name,threshold));
         //}
     }
 
     public void addSubscriberThres(String name,Threshold threshold) throws DuplicateSubscriber {
-        Subscriber subscriber=this.subscribers.stream()
-                .filter(s->s.getName().equals(name))
-                .findAny().get();
+        Subscriber subscriber=this.subscribers.get(name);
         if(subscriber==null){
             throw new DuplicateSubscriber(name+" subscriber not exist");
         }
@@ -49,9 +48,7 @@ public class Thermometer {
     }
 
     public List<Threshold> getSubscriberThresholds(String name){
-        Subscriber subscriber=this.subscribers.stream()
-                .filter(s->s.getName().equals(name))
-                .findAny().get();
+        Subscriber subscriber=this.subscribers.get(name);
         return subscriber.getThresholdManagers().stream()
                 .map(tm->tm.getThreshold())
                 .collect(Collectors.toList());
@@ -59,20 +56,19 @@ public class Thermometer {
 
 
     public List<SubscriberThresholdDTO> getSubscriberReachedThreshold(){
-        return this.subscribers.stream()
+        return this.subscribers.entrySet().stream()
                 .map(sub->{
-                    if(sub.getReachedThreshold()!=null)
-                        return new SubscriberThresholdDTO(sub.getName(),sub.getReachedThreshold().getName());
+                    Subscriber value = sub.getValue();
+                    if(value !=null)
+                        return new SubscriberThresholdDTO(value.getName(), value.getReachedThreshold().getName());
                     else
-                        return new SubscriberThresholdDTO(sub.getName(),"N/A");
+                        return new SubscriberThresholdDTO(value.getName(),"N/A");
                 })
                 .collect(Collectors.toList());
     }
 
     public Threshold getReachedThreshold(String subscriber_name){
-        Subscriber sub=this.subscribers.stream()
-                .filter(s->s.getName().equals(subscriber_name))
-                .findAny().get();
+        Subscriber sub=this.subscribers.get(subscriber_name);
         return sub.getReachedThreshold();
     }
 
@@ -81,21 +77,17 @@ public class Thermometer {
         final Exception e;
         while(source.hasNaxt()){
             AbstractTemperature temperature=source.readNext();
-            for(Subscriber subscriber : this.subscribers){
-                subscriber.setReachedThreshold(null);
-                subscriber.getThresholdManagers().forEach(mngr->{
-                    if(mngr.reach(temperature)){
-                        subscriber.setReachedThreshold(mngr.getThreshold());
-                    }
-                });
-                Threshold reachedt = subscriber.getReachedThreshold();
-                socketSender.notifyThresholdReachClient(subscriber.getName(), temperature,reachedt);
-            }
+            this.subscribers.entrySet().stream().forEach(entry->{
+                Subscriber subscriber=entry.getValue();
+                asyncProcessTemperature.processTemperature(temperature,subscriber);
+            });
         }
     }
 
 
-    public Optional<Subscriber> getSubscriber(String name) {
-        return this.subscribers.stream().filter(s->s.getName().equals(name)).findFirst();
+    public Subscriber getSubscriber(String name) {
+        return this.subscribers.get(name);
     }
+
+
 }

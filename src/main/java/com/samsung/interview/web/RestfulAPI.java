@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.validation.Valid;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -58,8 +57,8 @@ public class RestfulAPI {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> getSubscriberAndReachedThres(@PathVariable("name") String name) throws URISyntaxException {
         try {
-            Optional<Subscriber> subscriber=thermometer.getSubscriber(name);
-            return new ResponseEntity<>(subscriber.isPresent(),HttpStatus.OK);
+            Subscriber subscriber=thermometer.getSubscriber(name);
+            return new ResponseEntity<>(subscriber!=null,HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
