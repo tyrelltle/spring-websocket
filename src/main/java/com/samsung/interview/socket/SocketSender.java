@@ -24,4 +24,8 @@ public class SocketSender {
         thresholdReachedMessage.setCurrent_temperature(temperature.stringify());
         this.template.convertAndSend("/topic/"+client_name, thresholdReachedMessage);
     }
+
+    public void broadcastTemperature(AbstractTemperature temperature){
+        this.template.convertAndSend("/topic/temperature", temperature.stringify());
+    }
 }

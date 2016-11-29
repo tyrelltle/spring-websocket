@@ -16,6 +16,7 @@ public class AsyncProcessTemperature{
 
     @Async
     public void processTemperature(AbstractTemperature temperature,Subscriber subscriber){
+            socketSender.broadcastTemperature(temperature);
             subscriber.setReachedThreshold(null);
             subscriber.getThresholdManagers().forEach(mngr->{
                 if(mngr.reach(temperature)){
@@ -23,7 +24,8 @@ public class AsyncProcessTemperature{
                 }
             });
             Threshold reachedt = subscriber.getReachedThreshold();
-            socketSender.notifyThresholdReachClient(subscriber.getName(), temperature,reachedt);
-
+            if(reachedt!=null) {
+                socketSender.notifyThresholdReachClient(subscriber.getName(), temperature, reachedt);
+            }
     }
 }
